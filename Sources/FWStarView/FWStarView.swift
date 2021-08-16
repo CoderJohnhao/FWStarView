@@ -1,7 +1,10 @@
 import UIKit
 import AudioToolbox
 
+/// 星星评分
 public class FWStarView: UIView {
+    /// 是否可编辑
+    public var isEdit: Bool = true
     /// 分数
     public var rating: CGFloat = 0.0 {
         didSet {
@@ -10,6 +13,8 @@ public class FWStarView: UIView {
     }
     /// 回传当前分数
     public var currentRatingBlock: ((CGFloat) -> Void)?
+    /// 是否有震动效果
+    public var isVibrate: Bool = true
     
     /// 设置最大评分数，默认是5分
     private var maxRating: UInt = 5
@@ -19,7 +24,12 @@ public class FWStarView: UIView {
     private var space: CGFloat = 5.0
     /// 图片视图数组
     private var imageViews: [UIImageView] = []
-    
+    /// all星星
+    private var allImage = UIImage.image(named: "star_all")
+    /// 半星星
+    private var halfImage = UIImage.image(named: "star_half")
+    /// 灰星星
+    private var noneImage = UIImage.image(named: "star_none")
     
     /// 初始化
     /// - Parameters:
@@ -30,12 +40,23 @@ public class FWStarView: UIView {
     public init(frame: CGRect = .zero,
                 maxRating: UInt = 5,
                 size: CGSize = CGSize(width: 20, height: 20),
-                space: CGFloat = 5.0) {
+                space: CGFloat = 5.0,
+                allImage: UIImage? = nil,
+                halfImage: UIImage? = nil,
+                noneImage: UIImage? = nil) {
         super.init(frame: frame)
         self.maxRating = maxRating
         self.space = space
         self.size = size
-        
+        if let image = allImage {
+            self.allImage = image
+        }
+        if let image = halfImage {
+            self.halfImage = image
+        }
+        if let image = noneImage {
+            self.noneImage = image
+        }
         initUI()
         updateUI()
     }
@@ -53,7 +74,6 @@ public class FWStarView: UIView {
         var tempView: UIView = self
         for i in 0..<maxRating {
             let imageView = UIImageView()
-//            imageView.frame = CGRect(x: CGFloat(i) * (size.width + space), y: 0, width: size.width, height: size.height)
             imageViews.append(imageView)
             imageView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(imageView)
@@ -85,37 +105,20 @@ public class FWStarView: UIView {
         }
     }
     
+    /// 更新UI
     private func updateUI() {
         for (index, imageView) in imageViews.enumerated() {
             switch rating {
             case _ where rating >= CGFloat(index + 1 ):
-                imageView.image = UIImage.image(named: "star_all")
+                imageView.image = allImage
             case _ where rating > CGFloat(index):
-                imageView.image = UIImage.image(named: "star_half")
+                imageView.image = halfImage
             default:
-                imageView.image = UIImage.image(named: "star_none")
+                imageView.image = noneImage
             }
         }
         currentRatingBlock?(rating)
     }
-}
-
-extension FWStarView {
-    
-    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let touches = touches as NSSet
-        guard let touch = touches.anyObject() as? UITouch else { return }
-        let point = touch.location(in: self)
-        touchPoint(point)
-    }
-    
-    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let touches = touches as NSSet
-        guard let touch = touches.anyObject() as? UITouch else { return }
-        let point = touch.location(in: self)
-        touchPoint(point)
-    }
-    
     
     /// 手指点击位置
     /// - Parameter point: 点坐标
@@ -124,7 +127,7 @@ extension FWStarView {
         for i in stride(from: imageViews.count - 1, through: 0, by: -1) {
             let imageView = imageViews[i]
             let x = imageView.frame.origin.x
-            let center = x + imageView.frame.size.width / 2
+            let center = x + imageView.frame.size.width / 2.0
             if point.x > center {
                 newRating = CGFloat(i + 1)
                 break
@@ -135,7 +138,29 @@ extension FWStarView {
         }
         if rating != newRating {
             rating = newRating
-            AudioServicesPlaySystemSound(1520)
+            isVibrate ? AudioServicesPlaySystemSound(1520) : ()
+        }
+    }
+}
+
+// MARK: - Touch
+extension FWStarView {
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isEdit {
+            let touches = touches as NSSet
+            guard let touch = touches.anyObject() as? UITouch else { return }
+            let point = touch.location(in: self)
+            touchPoint(point)
+        }
+    }
+    
+    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isEdit {
+            let touches = touches as NSSet
+            guard let touch = touches.anyObject() as? UITouch else { return }
+            let point = touch.location(in: self)
+            touchPoint(point)
         }
     }
 }
