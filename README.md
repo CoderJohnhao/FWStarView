@@ -2,7 +2,7 @@
 
 > FWStarView是一个用于点评样式为⭐️⭐️的控件
 
-![IMG_71D0571658D4-1](/Users/jh/Documents/Johnhao/Swift/FWStarView/IMG_71D0571658D4-1.jpeg)
+![IMG_71D0571658D4-1](https://github.com/CoderJohnhao/FWStarView/blob/main/screenshot-20210816-173849.png)
 
 > 使用方式
 
