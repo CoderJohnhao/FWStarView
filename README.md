@@ -7,21 +7,18 @@
 > 使用方式
 
 ```swift
-/// 创建一个评分view
+// 创建一个评分view
 lazy var starView: FWStarView = {
 	FWStarView(maxRating: 5, size: CGSize(width: 24, height: 24), space: 16)
 }()
 
+// 是否开启震动反馈，默认是true
 starView.isVibrate = false
+// 分数
 starView.rating = 5.0
+// 是否可以编辑，默认是true
 starView.isEdit = false
 ```
-
-- isVibrate是否开启震动反馈，默认是true
-
-- rating分数
-
-- isEdit是否可以编辑，默认是true
 
   
 
